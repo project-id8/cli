@@ -94,7 +94,7 @@ jobs:
 
           # Get the last line which should be the version
           NEXT_VERSION=$(echo "$RESULT" | tail -n1)
-          
+
           if [ -z "$NEXT_VERSION" ]; then
             echo "Error: Could not determine next version"
             exit 1

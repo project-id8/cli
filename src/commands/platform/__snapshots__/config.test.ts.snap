@@ -1,0 +1,27 @@
+export const snapshot = {};
+
+snapshot[`platform config command help 1`] = `
+stdout:
+"
+Usage: COMMAND
+
+Options:
+
+  -h, --help  - Show this help.  
+
+Commands:
+
+  platform:config  - Manage platform configuration
+
+"
+stderr:
+""
+`;
+
+snapshot[`platform config set command 1`] = `
+stdout:
+"Setting platform config kubeConfig=/path/to/config
+"
+stderr:
+""
+`;

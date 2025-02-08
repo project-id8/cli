@@ -9,7 +9,7 @@ export default new Command()
       .option("--depends-on <app:string>", "Dependent application name", {
         required: true,
       })
-      .action(async (options) => {
+      .action((options) => {
         console.log("Adding dependency:", options.dependsOn);
       }),
   )
@@ -17,7 +17,7 @@ export default new Command()
     "graph",
     new Command()
       .description("View dependency graph")
-      .action(async () => {
+      .action(() => {
         console.log("Generating dependency graph...");
       }),
   );

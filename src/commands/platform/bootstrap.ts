@@ -7,4 +7,4 @@ export default new Command()
     // TODO: Implement platform bootstrapping
     // - Verify kubeConfig and kubeContext are set
     // - Initialize platform components
-  }); 
+  });

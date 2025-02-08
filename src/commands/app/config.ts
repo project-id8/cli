@@ -9,4 +9,4 @@ export default new Command()
     } else {
       console.log(`Getting value for ${key}`);
     }
-  }); 
+  });

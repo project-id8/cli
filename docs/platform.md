@@ -2,7 +2,8 @@
 
 ## Overview
 
-The platform commands are intended to help with the management of the platform itself.
+The platform commands are intended to help with the management of the platform
+itself.
 
 ## Application Lifecycle
 

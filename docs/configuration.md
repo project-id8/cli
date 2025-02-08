@@ -3,6 +3,7 @@
 ## Overview
 
 The CLI can be configured using:
+
 - Environment variables
 - Configuration file (`~/.project-id8/config.yaml`)
 - Command line arguments
@@ -21,7 +22,7 @@ Set default context to avoid repeating options:
 ```bash
 id8 config:set app payment-service
 id8 config:set env dev
-``` 
+```
 
 ## Configuration Precedence
 
@@ -56,4 +57,4 @@ PLATFORM_APP=payment-service
 PLATFORM_ENV=dev
 PLATFORM_KUBE_CONFIG=~/.kube/config
 PLATFORM_KUBE_CONTEXT=platform-cluster
-``` 
+```

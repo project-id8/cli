@@ -24,7 +24,7 @@ await new Command()
   .option("-a, --app <app:string>", "Specify the application")
   .option("-e, --env <environment:string>", "Specify the environment")
   .action((options, ...args) => {
-    console.log("Not implemented.", {options, args});
+    console.log("Not implemented.", { options, args });
   })
   // Built-in commands
   .command("completions", new CompletionsCommand().global())

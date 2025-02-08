@@ -15,7 +15,10 @@
 
 ## Code Style
 
-We follow the [Deno Style Guide](https://deno.land/manual/contributing/style_guide) with these additional guidelines:
+We follow the
+[Deno Style Guide](https://deno.land/manual/contributing/style_guide) with these
+additional guidelines:
+
 - Follow best practices and idioms
 - Use meaningful variable and function names
 - Add comments for complex logic
@@ -27,6 +30,7 @@ We follow the [Deno Style Guide](https://deno.land/manual/contributing/style_gui
 ## Branch Naming
 
 Use the following conventions for branch names:
+
 - Feature branches: `feature/description`
 - Bug fixes: `fix/description`
 - Documentation: `docs/description`
@@ -36,7 +40,8 @@ Example: `feature/add-kubernetes-support`
 
 ## Commit Messages
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/). Each commit message must be structured as:
+We follow [Conventional Commits](https://www.conventionalcommits.org/). Each
+commit message must be structured as:
 
 ```
 <type>(<scope>): <description>
@@ -47,6 +52,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/). Each com
 ```
 
 Where `type` is one of:
+
 - feat: A new feature
 - fix: A bug fix
 - docs: Documentation changes
@@ -59,6 +65,7 @@ Where `type` is one of:
 - chore: Other changes
 
 Examples:
+
 ```bash
 feat(k8s): add support for Kubernetes deployments
 fix(config): resolve environment variable parsing issue
@@ -105,6 +112,7 @@ deno test --coverage=coverage
 ## CI/CD Process
 
 Our CI/CD pipeline includes:
+
 1. Automated tests on pull requests
 2. Code quality checks:
    - Formatting validation
@@ -126,4 +134,4 @@ Our CI/CD pipeline includes:
 
 - Join our community chat
 - Ask questions in GitHub discussions
-- Tag issues with 'help wanted' 
+- Tag issues with 'help wanted'

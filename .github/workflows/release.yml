@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   verify:
@@ -20,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: "lts/*"
 
       - name: Get version from tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
@@ -49,22 +49,22 @@ jobs:
       - name: Compile for all platforms
         run: |
           mkdir -p dist
-          
+
           # Compile for macOS (Apple Silicon)
           deno compile --allow-read --allow-write --allow-env --allow-net \
             --target aarch64-apple-darwin \
             --output dist/id8-darwin-arm64 main.ts
-          
+
           # Compile for macOS (Intel)
           deno compile --allow-read --allow-write --allow-env --allow-net \
             --target x86_64-apple-darwin \
             --output dist/id8-darwin-amd64 main.ts
-          
+
           # Compile for Linux (x86_64)
           deno compile --allow-read --allow-write --allow-env --allow-net \
             --target x86_64-unknown-linux-gnu \
             --output dist/id8-linux-amd64 main.ts
-          
+
           # Compile for Linux (ARM64)
           deno compile --allow-read --allow-write --allow-env --allow-net \
             --target aarch64-unknown-linux-gnu \
@@ -74,11 +74,11 @@ jobs:
         run: |
           mkdir -p releases
           cd dist
-          
+
           for binary in id8-*; do
             tar czf "../releases/${binary}.tar.gz" "${binary}" ../LICENSE ../README.md
           done
-          
+
           cd ../releases
           sha256sum *.tar.gz > checksums.txt
 
@@ -103,7 +103,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: "lts/*"
 
       - name: Generate changelog
         env:
@@ -140,7 +140,7 @@ jobs:
           mkdir -p release
           mv artifacts/release-artifacts/* release/
           mv artifacts/changelog/changelog.md release/
-          
+
           # Add checksums to changelog
           echo -e "\n## SHA256 Checksums\n\`\`\`" >> release/changelog.md
           cat release/checksums.txt >> release/changelog.md
@@ -203,4 +203,4 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add homebrew/id8.rb
           git commit -m "chore: update homebrew formula for v${VERSION}"
-          git push 
+          git push

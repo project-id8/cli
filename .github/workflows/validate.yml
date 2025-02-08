@@ -34,7 +34,7 @@ jobs:
               COMMITS=$(git log --format="%s")
             fi
           fi
-          
+
           # Check if all commits follow conventional commit format
           STATUS="success"
           echo "$COMMITS" | while read -r commit; do
@@ -109,4 +109,4 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.lcov
-          fail_ci_if_error: false 
+          fail_ci_if_error: false

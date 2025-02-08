@@ -1,6 +1,8 @@
 # ID8 CLI
 
-The `id8` CLI is a command line tool designed for platform engineering teams adopting GitOps practices. It provides a unified interface to manage applications and platform services through infrastructure-as-code.
+The `id8` CLI is a command line tool designed for platform engineering teams
+adopting GitOps practices. It provides a unified interface to manage
+applications and platform services through infrastructure-as-code.
 
 [![Release](https://img.shields.io/github/v/release/project-id8/cli)](https://github.com/project-id8/cli/releases)
 [![Build Status](https://github.com/project-id8/cli/workflows/Release/badge.svg)](https://github.com/project-id8/cli/actions)
@@ -34,12 +36,14 @@ id8 --version
 ```
 
 2. Set your default context:
+
 ```bash
 id8 config set --app my-service
 id8 config set --env dev
 ```
 
 3. Start managing your application:
+
 ```bash
 # Initialize a new application
 id8 app:init
@@ -59,15 +63,18 @@ id8 app:status
 
 ## Contributing
 
-See our [Contributing Guide](docs/contributing.md) for details on our code of conduct and development process.
+See our [Contributing Guide](docs/contributing.md) for details on our code of
+conduct and development process.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
+for details.
 
 ## Support
 
 For support, please:
+
 1. Check the [documentation](https://docs.project-id8.org)
 2. Open an issue on GitHub
 3. Contact the platform engineering team

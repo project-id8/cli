@@ -9,4 +9,4 @@ export default new Command()
     if (options.template) {
       console.log("Using template:", options.template);
     }
-  }); 
+  });

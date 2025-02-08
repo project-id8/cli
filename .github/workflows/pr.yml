@@ -26,4 +26,4 @@ jobs:
             echo "❌ Code quality checks or tests failed"
             exit 1
           fi
-          echo "✅ All checks passed" 
+          echo "✅ All checks passed"

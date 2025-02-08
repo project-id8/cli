@@ -1,0 +1,112 @@
+name: Validate
+
+on:
+  workflow_call:
+    outputs:
+      commit_check:
+        description: "Status of commit message validation"
+        value: ${{ jobs.commits.outputs.status }}
+
+jobs:
+  commits:
+    name: Validate Commits
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.check.outputs.status }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check conventional commits
+        id: check
+        run: |
+          # For PRs, check only PR commits
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            COMMITS=$(git log --format="%s" ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          else
+            # For other events, check since last tag
+            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            if [[ -n "$LATEST_TAG" ]]; then
+              COMMITS=$(git log $LATEST_TAG..HEAD --format="%s")
+            else
+              COMMITS=$(git log --format="%s")
+            fi
+          fi
+          
+          # Check if all commits follow conventional commit format
+          STATUS="success"
+          echo "$COMMITS" | while read -r commit; do
+            if ! echo "$commit" | grep -qE "^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\(.+\))?: .+$"; then
+              echo "Error: Commit does not follow conventional commit format: $commit"
+              STATUS="failure"
+              break
+            fi
+          done
+          echo "status=${STATUS}" >> $GITHUB_OUTPUT
+
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.1.7"
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
+
+      - name: Check formatting
+        run: deno fmt --check
+
+      - name: Run linter
+        run: deno lint
+
+      - name: Type check
+        run: deno check main.ts
+
+  tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.1.7"
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
+
+      - name: Run tests
+        run: deno test -A --parallel --coverage=coverage
+
+      - name: Generate coverage report
+        run: deno coverage coverage --lcov > coverage.lcov
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.lcov
+          fail_ci_if_error: false 

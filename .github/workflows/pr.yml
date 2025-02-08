@@ -1,0 +1,29 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate:
+    name: Validate
+    uses: ./.github/workflows/validate.yml
+
+  status-check:
+    name: Status Check
+    needs: validate
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check validation status
+        run: |
+          if [[ "${{ needs.validate.outputs.commit_check }}" != "success" ]]; then
+            echo "❌ Commit messages do not follow conventional commit format"
+            exit 1
+          fi
+          if [[ "${{ needs.validate.result }}" != "success" ]]; then
+            echo "❌ Code quality checks or tests failed"
+            exit 1
+          fi
+          echo "✅ All checks passed" 

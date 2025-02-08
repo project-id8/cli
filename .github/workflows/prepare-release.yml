@@ -1,0 +1,123 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_as:
+        description: 'Force release type (optional)'
+        required: false
+        type: choice
+        options:
+          - auto
+          - major
+          - minor
+          - patch
+        default: 'auto'
+      pre_release:
+        description: 'Pre-release tag (optional, e.g. alpha, beta, rc)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Dry run (validate without making changes)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  validate:
+    name: Validate
+    uses: ./.github/workflows/validate.yml
+
+  prepare:
+    name: Prepare Release
+    needs: validate
+    if: |
+      needs.validate.outputs.commit_check != 'failure' &&
+      needs.validate.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Create Release
+        id: create_release
+        run: |
+          # Build fork-version arguments
+          ARGS=""
+          
+          # Add release type if specified
+          if [ "${{ github.event.inputs.release_as }}" != "auto" ]; then
+            ARGS="$ARGS --release-as ${{ github.event.inputs.release_as }}"
+          fi
+          
+          # Add pre-release tag if specified
+          if [ -n "${{ github.event.inputs.pre_release }}" ]; then
+            ARGS="$ARGS --pre-release-tag ${{ github.event.inputs.pre_release }}"
+          fi
+          
+          # Add dry-run if specified
+          if [ "${{ github.event.inputs.dry_run }}" == "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+
+          # First do a dry run to capture the next version
+          NEXT_VERSION=$(npx fork-version $ARGS --dry-run --inspect-version 2>&1 | tail -n1)
+          echo "next_version=${NEXT_VERSION}" >> $GITHUB_OUTPUT
+          
+          if [ "${{ github.event.inputs.dry_run }}" == "false" ]; then
+            # Actually create the release
+            npx fork-version $ARGS
+          else
+            echo "Dry run completed. Would create version: ${NEXT_VERSION}"
+          fi
+
+      - name: Push changes
+        if: github.event.inputs.dry_run != 'true'
+        run: git push --follow-tags
+        
+      - name: Notify about release preparation
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const isDryRun = '${{ github.event.inputs.dry_run }}' === 'true';
+            const version = '${{ steps.create_release.outputs.next_version }}';
+            const releaseType = '${{ github.event.inputs.release_as }}' === 'auto' 
+              ? 'automatically determined' 
+              : '${{ github.event.inputs.release_as }}';
+            const preRelease = '${{ github.event.inputs.pre_release }}' || 'none';
+            
+            const body = `
+            🎉 Release ${isDryRun ? 'would be' : 'has been'} prepared!
+            
+            Details:
+            - Version: ${version}
+            - Release Type: ${releaseType}
+            - Pre-release: ${preRelease}
+            - Dry Run: ${isDryRun}
+            
+            ${isDryRun ? '**This was a dry run. No changes were made.**' : '**The release workflow has been triggered.**'}
+            `;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+
+    outputs:
+      version: ${{ steps.create_release.outputs.next_version }} 

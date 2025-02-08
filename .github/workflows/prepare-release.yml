@@ -74,18 +74,29 @@ jobs:
             ARGS="$ARGS --dry-run"
           fi
 
+          echo "Running fork-version with arguments: $ARGS"
+
           # First do a dry run to capture the next version
-          # Capture both stdout and stderr, but to different variables
+          # Capture both stdout and stderr
+          set +e  # Disable automatic exit on error
           RESULT=$(npx fork-version $ARGS --dry-run --inspect-version 2>&1)
           EXIT_CODE=$?
+          set -e  # Re-enable automatic exit on error
 
-          # Get the last line which should be the version
-          NEXT_VERSION=$(echo "$RESULT" | tail -n1)
+          echo "Command output:"
+          echo "$RESULT"
 
           # If there was an error, show the full output and exit
           if [ $EXIT_CODE -ne 0 ]; then
-            echo "Error running fork-version:"
-            echo "$RESULT"
+            echo "Error: fork-version failed with exit code $EXIT_CODE"
+            exit 1
+          fi
+
+          # Get the last line which should be the version
+          NEXT_VERSION=$(echo "$RESULT" | tail -n1)
+          
+          if [ -z "$NEXT_VERSION" ]; then
+            echo "Error: Could not determine next version"
             exit 1
           fi
 

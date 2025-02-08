@@ -78,17 +78,17 @@ jobs:
           # Capture both stdout and stderr, but to different variables
           RESULT=$(npx fork-version $ARGS --dry-run --inspect-version 2>&1)
           EXIT_CODE=$?
-          
+
           # Get the last line which should be the version
           NEXT_VERSION=$(echo "$RESULT" | tail -n1)
-          
+
           # If there was an error, show the full output and exit
           if [ $EXIT_CODE -ne 0 ]; then
             echo "Error running fork-version:"
             echo "$RESULT"
             exit 1
           fi
-          
+
           echo "next_version=${NEXT_VERSION}" >> $GITHUB_OUTPUT
 
           if [ "${{ github.event.inputs.dry_run }}" == "false" ]; then

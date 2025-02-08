@@ -101,6 +101,7 @@ jobs:
           fi
 
           echo "next_version=${NEXT_VERSION}" >> $GITHUB_OUTPUT
+          echo "NEXT_VERSION=${NEXT_VERSION}" >> $GITHUB_ENV
 
           if [ "${{ github.event.inputs.dry_run }}" == "false" ]; then
             # Actually create the release
@@ -111,7 +112,15 @@ jobs:
 
       - name: Push changes
         if: github.event.inputs.dry_run != 'true'
-        run: git push --follow-tags
+        run: |
+          echo "Current tags:"
+          git tag -l
+          echo "\nPushing changes..."
+          git push
+          echo "\nPushing tag (version: $NEXT_VERSION)..."
+          git push origin "v$NEXT_VERSION"
+          echo "\nVerifying remote tags:"
+          git ls-remote --tags origin
 
     outputs:
       version: ${{ steps.create_release.outputs.next_version }}

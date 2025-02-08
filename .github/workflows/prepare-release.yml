@@ -28,12 +28,37 @@ jobs:
     name: Validate
     uses: ./.github/workflows/validate.yml
 
+  test-build:
+    name: Test Build
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.1.7"
+
+      - name: Validate build process
+        run: |
+          make clean build
+          # Check if binaries were created successfully
+          for platform in darwin-arm64 darwin-amd64 linux-amd64 linux-arm64; do
+            if [ ! -f "dist/id8-${platform}" ]; then
+              echo "Error: Binary for ${platform} was not created"
+              exit 1
+            fi
+          done
+
   prepare:
     name: Prepare Release
-    needs: validate
+    needs: [validate, test-build]
     if: |
       needs.validate.outputs.commit_check != 'failure' &&
-      needs.validate.result == 'success'
+      needs.validate.result == 'success' &&
+      needs.test-build.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -52,49 +52,16 @@ jobs:
         with:
           deno-version: "2.1.7"
 
-      - name: Compile for all platforms
-        run: |
-          mkdir -p dist
-
-          # Compile for macOS (Apple Silicon)
-          deno compile --allow-read --allow-write --allow-env --allow-net \
-            --target aarch64-apple-darwin \
-            --output dist/id8-darwin-arm64 main.ts
-
-          # Compile for macOS (Intel)
-          deno compile --allow-read --allow-write --allow-env --allow-net \
-            --target x86_64-apple-darwin \
-            --output dist/id8-darwin-amd64 main.ts
-
-          # Compile for Linux (x86_64)
-          deno compile --allow-read --allow-write --allow-env --allow-net \
-            --target x86_64-unknown-linux-gnu \
-            --output dist/id8-linux-amd64 main.ts
-
-          # Compile for Linux (ARM64)
-          deno compile --allow-read --allow-write --allow-env --allow-net \
-            --target aarch64-unknown-linux-gnu \
-            --output dist/id8-linux-arm64 main.ts
-
-      - name: Create archives and checksums
-        run: |
-          mkdir -p releases
-          cd dist
-
-          for binary in id8-*; do
-            tar czf "../releases/${binary}.tar.gz" "${binary}" ../LICENSE ../README.md
-          done
-
-          cd ../releases
-          sha256sum *.tar.gz > checksums.txt
+      - name: Build and package binaries
+        run: make all
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: release-artifacts
           path: |
-            releases/*.tar.gz
-            releases/checksums.txt
+            dist/*.tar.gz
+            dist/checksums.txt
 
   changelog:
     name: Generate Changelog
